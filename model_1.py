@@ -1,6 +1,6 @@
 import json
-import sys
-with open('sentences.json', 'r') as f:
+
+with open('data/sentences.json', 'r') as f:
     SENTENCE_PAIRS = json.load(f)
 
 
@@ -13,7 +13,6 @@ words = {lang: set(source_words(lang)) for lang in
          ('en', 'fr')}
 
 
-# initialize t(e|f) uniformly
 translation_probabilities = {
     word_en: {
         word_fr: 1/len(words['en'])
