@@ -1,4 +1,13 @@
 def distance(table_1, table_2):
+    '''
+    modelling the tables as vectors, whose indices are essentially some
+    hashing function applied to each (row key, col key) pair, return the
+    euclidean distance between them, where euclidean distance is defined as
+
+    sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + ... + (a[n] - b[n])**2)
+
+    assumes that table_1 and table_2 are identical in structure
+    '''
     row_keys = table_1.keys()
     cols = list(table_1.values())
     col_keys = cols[0].keys()

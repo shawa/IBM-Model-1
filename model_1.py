@@ -8,7 +8,7 @@ from table_distance import distance
 
 def get_corpus(filename):
     '''
-    load corpus file located at `filename` into a list of dicts
+    Load corpus file located at `filename` into a list of dicts
     '''
     with open(filename, 'r') as f:
         sentence_pairs = json.load(f)
@@ -17,7 +17,7 @@ def get_corpus(filename):
 
 def get_words(corpus):
     '''
-    from a `corpus` object, build a dict whose keys are 'en' and 'fr',
+    From a `corpus` object, build a dict whose keys are 'en' and 'fr',
     and whose values are sets. Each dict[language] set contains every
     word in that language which appears in the corpus
     '''
@@ -30,7 +30,7 @@ def get_words(corpus):
 
 def init_translation_probabilities(corpus):
     '''
-    given a `corpus` generate the first set of translation probabilities,
+    Given a `corpus` generate the first set of translation probabilities,
     which can be accessed as
     p(e|s) <=> translation_probabilities[e][s]
     we first assume that for an `e` and set of `s`s, it is equally likely
@@ -45,7 +45,7 @@ def init_translation_probabilities(corpus):
 
 def train_iteration(corpus, words, total_s, prev_translation_probabilities):
     '''
-    perform one iteration of the EM-Algorithm
+    Perform one iteration of the EM-Algorithm
 
     corpus: corpus object to train from
     words: {language: {word}} mapping
@@ -86,7 +86,7 @@ def train_iteration(corpus, words, total_s, prev_translation_probabilities):
 
 def is_converged(probabilties_prev, probabilties_curr, epsilon):
     '''
-    decide when the model whose final two iterations are
+    Decide when the model whose final two iterations are
     `probabilties_prev` and `probabilties_curr` has converged
     '''
     return distance(probabilties_prev, probabilties_curr) < epsilon
@@ -94,7 +94,7 @@ def is_converged(probabilties_prev, probabilties_curr, epsilon):
 
 def train_model(corpus, epsilon):
     '''
-    given a `corpus` and `epsilon`, train a translation model on that corpus
+    Given a `corpus` and `epsilon`, train a translation model on that corpus
     '''
     words = get_words(corpus)
 
@@ -122,10 +122,10 @@ def main(infile, *, epsilon:'e'=0.1):
     '''
     IBM Model 1 SMT Training Example
 
-    infile: json file containing english-french sentence pairs
+    infile: JSON file containing English-French sentence pairs
             in the form [ {"en": <sentence>, "fr": <sentence>}, ... ]
 
-    epsilon: acceptable euclidian distance between translation probability
+    epsilon: Acceptable euclidean distance between translation probability
              vectors across iterations
     '''
     corpus = get_corpus(infile)
