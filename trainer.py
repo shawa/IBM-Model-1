@@ -2,6 +2,7 @@ import json
 import pprint
 import clize
 import sys
+from operator import itemgetter
 from copy import deepcopy
 
 
@@ -128,6 +129,23 @@ def train_model(corpus, epsilon):
     return translation_probabilities, iterations
 
 
+def summarize_results(translation_probabilities):
+    '''
+    from a dict of source: {target: p(source|target}, return
+    a list of mappings from source words to the most probable target word
+    '''
+    return {
+        # for each english word
+        # sort the words it could translate to; most probable first
+        k: sorted(v.items(), key=itemgetter(1), reverse=True)
+        # then grab the head of that == `(most_probable, p(k|most probable)`
+        [0]
+        # and the first of that pair (the actual word!)
+        [0]
+        for (k, v) in translation_probabilities.items()
+    }
+
+
 def main(infile, *, outfile:'o'=None, epsilon:'e'=0.001, verbose:'v'=False):
     '''
     IBM Model 1 SMT Training Example
@@ -150,13 +168,13 @@ def main(infile, *, outfile:'o'=None, epsilon:'e'=0.001, verbose:'v'=False):
     else:
         corpus = get_corpus(infile)
 
-    result, iterations = train_model(corpus, epsilon)
-
+    probabilities, iterations = train_model(corpus, epsilon)
+    result_table = summarize_results(probabilities)
     if outfile:
         with open(outfile, 'w') as f:
-            json.dump(result, f)
+            json.dump(result_table, f)
     else:
-        json.dump(result, sys.stdout)
+        json.dump(result_table, sys.stdout)
 
     if VERBOSE:
         print('Performed {} iterations'.format(iterations), file=sys.stderr)
