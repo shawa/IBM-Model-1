@@ -1,9 +1,13 @@
 import json
 import pprint
 import clize
+import sys
 from copy import deepcopy
 
+
 from table_distance import distance
+
+VERBOSE = False
 
 
 def get_corpus(filename):
@@ -11,9 +15,11 @@ def get_corpus(filename):
     Load corpus file located at `filename` into a list of dicts
     '''
     with open(filename, 'r') as f:
-        sentence_pairs = json.load(f)
-    return sentence_pairs
+        corpus = json.load(f)
 
+    if VERBOSE:
+        print(corpus, file=sys.stderr)
+    return corpus
 
 def get_words(corpus):
     '''
@@ -89,7 +95,11 @@ def is_converged(probabilties_prev, probabilties_curr, epsilon):
     Decide when the model whose final two iterations are
     `probabilties_prev` and `probabilties_curr` has converged
     '''
-    return distance(probabilties_prev, probabilties_curr) < epsilon
+    delta = distance(probabilties_prev, probabilties_curr)
+    if VERBOSE:
+        print(delta, file=sys.stderr)
+
+    return delta < epsilon
 
 
 def train_model(corpus, epsilon):
@@ -118,19 +128,38 @@ def train_model(corpus, epsilon):
     return translation_probabilities, iterations
 
 
-def main(infile, *, epsilon:'e'=0.1):
+def main(infile, *, outfile:'o'=None, epsilon:'e'=0.001, verbose:'v'=False):
     '''
     IBM Model 1 SMT Training Example
 
-    infile: JSON file containing English-French sentence pairs
+    infile: path to JSON file containing English-French sentence pairs
             in the form [ {"en": <sentence>, "fr": <sentence>}, ... ]
+
+    outfile: path to output file (defaults to stdout)
 
     epsilon: Acceptable euclidean distance between translation probability
              vectors across iterations
+
+    verbose: print running info to stderr
     '''
-    corpus = get_corpus(infile)
+    global VERBOSE
+    VERBOSE = verbose
+
+    if infile == '-':
+        corpus = get_corpus(sys.stdin)
+    else:
+        corpus = get_corpus(infile)
+
     result, iterations = train_model(corpus, epsilon)
-    pprint.pprint(result)
+
+    if outfile:
+        with open(outfile, 'w') as f:
+            json.dump(result, f)
+    else:
+        json.dump(result, sys.stdout)
+
+    if VERBOSE:
+        print('Performed {} iterations'.format(iterations), file=sys.stderr)
 
 if __name__ == '__main__':
     clize.run(main)
