@@ -1,0 +1,22 @@
+[
+  {
+    "fr": "la maison",
+    "en": "the house"
+  },
+  {
+    "fr": "la fleur",
+    "en": "the flower"
+  },
+  {
+    "fr": "la maison bleu",
+    "en": "the blue house"
+  },
+  {
+    "fr": "la fleur bleu",
+    "en": "the blue flower"
+  },
+  {
+    "fr": "pomme bleu",
+    "en": "blue apple"
+  }
+]
