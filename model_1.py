@@ -5,13 +5,22 @@ from copy import deepcopy
 
 from table_distance import distance
 
+
 def get_corpus(filename):
+    '''
+    load corpus file located at `filename` into a list of dicts
+    '''
     with open(filename, 'r') as f:
         sentence_pairs = json.load(f)
     return sentence_pairs
 
 
 def get_words(corpus):
+    '''
+    from a `corpus` object, build a dict whose keys are 'en' and 'fr',
+    and whose values are sets. Each dict[language] set contains every
+    word in that language which appears in the corpus
+    '''
     def source_words(lang):
         for pair in corpus:
             for word in pair[lang].split():
@@ -20,6 +29,13 @@ def get_words(corpus):
 
 
 def init_translation_probabilities(corpus):
+    '''
+    given a `corpus` generate the first set of translation probabilities,
+    which can be accessed as
+    p(e|s) <=> translation_probabilities[e][s]
+    we first assume that for an `e` and set of `s`s, it is equally likely
+    that e will translate to any s in `s`s
+    '''
     words = get_words(corpus)
     return {
         word_en: {word_fr: 1/len(words['en'])
@@ -28,6 +44,18 @@ def init_translation_probabilities(corpus):
 
 
 def train_iteration(corpus, words, total_s, prev_translation_probabilities):
+    '''
+    perform one iteration of the EM-Algorithm
+
+    corpus: corpus object to train from
+    words: {language: {word}} mapping
+
+    total_s: counts of the destination words, weighted according to
+             their translation probabilities t(e|s)
+
+    prev_translation_probabilities: the translation_probabilities from the
+                                    last iteration of the EM algorithm
+    '''
     translation_probabilities = deepcopy(prev_translation_probabilities)
 
     counts = {word_en: {word_fr: 0 for word_fr in words['fr']}
@@ -57,10 +85,17 @@ def train_iteration(corpus, words, total_s, prev_translation_probabilities):
 
 
 def is_converged(probabilties_prev, probabilties_curr, epsilon):
+    '''
+    decide when the model whose final two iterations are
+    `probabilties_prev` and `probabilties_curr` has converged
+    '''
     return distance(probabilties_prev, probabilties_curr) < epsilon
 
 
 def train_model(corpus, epsilon):
+    '''
+    given a `corpus` and `epsilon`, train a translation model on that corpus
+    '''
     words = get_words(corpus)
 
     total_s = {word_en: 0 for word_en in words['en']}
